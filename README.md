@@ -34,15 +34,26 @@ Private key of address account owner will deploy smart contract
 #### 1. Smart contract Token
 
 Using tokens for exchange, token holders have many benefits such as staking, rewards and can participate in voting for system decisions.
-Constructor deploy smart contract: - Owner smart conntract - Supply token - Tax point 0-10000 (1% = 100) - Addreess pool
+Constructor deploy smart contract:
+
+- Owner smart conntract
+- Supply token
+- Tax point 0-10000 (1% = 100) - Addreess pool
 
 #### 2. Smart contract Timelock
 
-Prevents immediate changes to decisions after voting, setting a time period for decisions to wait until they are implemented. - minDelay (Time need wait to implement) - Address proposer[] - Addrees executtor[]
+Prevents immediate changes to decisions after voting, setting a time period for decisions to wait until they are implemented.
+
+- minDelay (Time need wait to implement)
+- Address proposer[]
+- Addrees executtor[]
 
 #### 3. Smart contract CarbonGovernor
 
-Build a decentralized governance mechanism, create proposals for construction and development decisions, and decisions approved through the community. - Address of token wrapped by ERC20Votes - Address of smart contract Timelock execute
+Build a decentralized governance mechanism, create proposals for construction and development decisions, and decisions approved through the community.
+
+- Address of token wrapped by ERC20Votes.
+- Address of smart contract Timelock execute.
 
 ## Running Tests
 
