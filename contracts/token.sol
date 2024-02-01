@@ -3,15 +3,19 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import "@openzeppelin/contracts/utils/Nonces.sol";
 
-contract Token is ERC20, Ownable {
+contract Token is Ownable, ERC20, ERC20Permit, ERC20Votes {
+
         uint256 public constant MAX_TAX_RATE = 10000;
         // Transaction tax rate in basis points (1% = 100 basis points)
         uint256 public transactionTaxRate ;
         address public receiveTax;
         uint256 public poolReward;
+        uint256 public rewardTokenAmount;
 
-        // Mapping to track timestamp 
         mapping(address => uint256) private holderSince;
 
         constructor(
@@ -22,6 +26,8 @@ contract Token is ERC20, Ownable {
             )
         ERC20("Carbon Token Proposals", "CTP")
         Ownable(_inititalOwner)
+        ERC20Permit("GT")
+        ERC20Votes()
         {
             _mint(msg.sender, _inititalSupply);
             transactionTaxRate = _transactionTax;
@@ -34,6 +40,14 @@ contract Token is ERC20, Ownable {
 
         function burn(uint256 amount) external {
             _burn(msg.sender, amount);
+        }
+
+        function _update(address from, address to, uint256 value) internal virtual override(ERC20, ERC20Votes) {
+            super._update(from, to, value);
+        }
+
+        function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
+            return super.nonces(owner);
         }
 
         function setTransactionTaxRate(uint256 _newTaxRate) external onlyOwner {
@@ -79,6 +93,11 @@ contract Token is ERC20, Ownable {
 
         function rewardForValidEvidence(address recipient) external  {
             require(recipient != address(0), "Address is not valid.");
-            super._mint(recipient, 100);
+            super._mint(recipient, rewardTokenAmount);
+        }
+
+        function setRewardTokenAmount(uint256 _newRewardTokenAmount) external onlyOwner {
+            require(_newRewardTokenAmount > 0, "Reward token amount must be greater than 0");
+            rewardTokenAmount = _newRewardTokenAmount;
         }
 }
