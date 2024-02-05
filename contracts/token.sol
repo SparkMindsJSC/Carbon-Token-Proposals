@@ -5,10 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-import "@openzeppelin/contracts/utils/Nonces.sol";
 
-contract Token is Ownable, ERC20, ERC20Permit, ERC20Votes {
-
+contract Token is ERC20, Ownable, ERC20Votes, ERC20Permit {
         uint256 public constant MAX_TAX_RATE = 10000;
         // Transaction tax rate in basis points (1% = 100 basis points)
         uint256 public transactionTaxRate ;
@@ -34,6 +32,13 @@ contract Token is Ownable, ERC20, ERC20Permit, ERC20Votes {
             receiveTax = _receiveTax;            
         }
 
+        function setRewardTokenAmount(uint256 _newRewardTokenAmount) external {
+            require(_newRewardTokenAmount > 0, "Reward token amount must be greater than 0");
+            require(_newRewardTokenAmount + rewardTokenAmount >= _newRewardTokenAmount, "Overflow during reward token amount update");
+
+            rewardTokenAmount = _newRewardTokenAmount;
+        }
+
         function mint(address to,uint256 amount) external onlyOwner {
             _mint(to, amount);
         }
@@ -42,22 +47,30 @@ contract Token is Ownable, ERC20, ERC20Permit, ERC20Votes {
             _burn(msg.sender, amount);
         }
 
-        function _update(address from, address to, uint256 value) internal virtual override(ERC20, ERC20Votes) {
-            super._update(from, to, value);
-        }
+         function clock() public view override returns (uint48) {
+        return uint48(block.timestamp);
+    }
 
-        function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
-            return super.nonces(owner);
-        }
+      function CLOCK_MODE() public pure override returns (string memory) {
+        return "mode=timestamp";
+    }
 
-        function setTransactionTaxRate(uint256 _newTaxRate) external onlyOwner {
-            require(_newTaxRate<MAX_TAX_RATE, "Tax rate must be in basic point 0 - 10000");
-            transactionTaxRate = _newTaxRate;    
-        }
+    function _update(address from, address to, uint256 value) internal virtual override(ERC20, ERC20Votes) {
+        super._update(from, to, value);
+    }
 
-        function setReceiveTax(address _newReceiveTax) external onlyOwner {
-            receiveTax = _newReceiveTax;
-        }
+    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
+        return super.nonces(owner);
+    }
+
+    function setTransactionTaxRate(uint256 _newTaxRate) external onlyOwner {
+        require(_newTaxRate<MAX_TAX_RATE, "Tax rate must be in basic point 0 - 10000");
+        transactionTaxRate = _newTaxRate;    
+    }
+
+    function setReceiveTax(address _newReceiveTax) external onlyOwner {
+        receiveTax = _newReceiveTax;
+    }
 
         function transfer(address to, uint256 amount) public virtual  override returns (bool) {
             uint256 taxAmount = (amount * transactionTaxRate) / 10000;
@@ -74,30 +87,11 @@ contract Token is Ownable, ERC20, ERC20Permit, ERC20Votes {
             }
 
             return true;            
-        }
-
-        function claimRewards() external returns (bool) {
-            require(holderSince[msg.sender] > 0, "Not a holder");
-            uint256 holdingDuration = block.timestamp - holderSince[msg.sender];
-            require(holdingDuration >= 30, "Not eligible for rewards yet");
-
-
-            uint256 rewards = holdingDuration / 1 days;
-
-            require(rewards <= poolReward, "Insufficient rewards in the pool");
-            _transfer(receiveTax, msg.sender, rewards);
-            poolReward -= rewards;
-
-            return true;
-        }     
+        }  
 
         function rewardForValidEvidence(address recipient) external  {
             require(recipient != address(0), "Address is not valid.");
             super._mint(recipient, rewardTokenAmount);
         }
 
-        function setRewardTokenAmount(uint256 _newRewardTokenAmount) external onlyOwner {
-            require(_newRewardTokenAmount > 0, "Reward token amount must be greater than 0");
-            rewardTokenAmount = _newRewardTokenAmount;
-        }
 }

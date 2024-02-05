@@ -8,6 +8,7 @@ contract EvidenceStorage is Owner {
     struct Evidence {
         address submitter;
         uint256 createAt;
+        bytes signature;
     }
     
     constructor(address _owner) Owner(_owner) {
@@ -18,24 +19,29 @@ contract EvidenceStorage is Owner {
     
     bytes32[] public evidenceHashList;
 
-    event EvidenceSubmitted(address indexed submitter, bytes32 indexed evidenceHash, uint256 createAt);
+    event EvidenceSubmitted(address indexed submitter, bytes32 indexed evidenceHash, bytes indexed _signature, uint256 createAt);
 
     modifier onlySubmitter(bytes32 evidenceHash) {
         require(msg.sender == evidences[evidenceHash].submitter, "Not the submmiter");
         _;
     }
 
-    function submitEvidence(bytes32 evidenceHash, uint256 createAt) external  {
-        require(evidences[evidenceHash].submitter == address(0), "Evidence already submitted.");        
-        evidences[evidenceHash] = Evidence(msg.sender, createAt);
-        evidenceHashList.push(evidenceHash);
+    function submitEvidence(bytes32 _evidenceHash, bytes memory _signature) external  {
+        require(evidences[_evidenceHash].submitter == address(0), "Evidence already submitted.");       
+        uint256 timestamp = block.timestamp; 
+        evidences[_evidenceHash] = Evidence({
+            submitter: msg.sender,
+            createAt: timestamp,
+            signature:_signature
+        });
+        evidenceHashList.push(_evidenceHash);
        
-        emit EvidenceSubmitted(msg.sender, evidenceHash, createAt);
+        emit EvidenceSubmitted(msg.sender, _evidenceHash, _signature, timestamp);
     }
 
-    function retrieveEvidence(bytes32 evidenceHash) external view onlySubmitter(evidenceHash) returns (address, uint256) {
+    function retrieveEvidence(bytes32 evidenceHash) external view onlySubmitter(evidenceHash) returns (address, uint256, bytes memory) {
         Evidence memory evidence = evidences[evidenceHash];
-        return (evidence.submitter, evidence.createAt);
+        return (evidence.submitter, evidence.createAt, evidence.signature);
     }
 
     function getAllEvidenceHashes() external onlyOwner view returns (bytes32[] memory) {

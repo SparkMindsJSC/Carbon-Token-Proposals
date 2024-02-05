@@ -4,55 +4,69 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 
 import "./interfaces/IToken.sol";
 import "./Token.sol";
 import "./EvidenceStorage.sol";
 
 contract EvidenceValidator {
+    using SignatureChecker for address;
+
     IToken public tokenContract;
     address public addressEvidenceStorage;
+    address public signer;
 
     event EvidenceValidated(address indexed submitter, bytes32 indexed evidenceHash, bool isValid);
+    event SignatureVerified(address indexed submitter, bytes indexed signature, bool isVerified);
 
     mapping(bytes32 => bool) public validatedEvidence;
 
     constructor(
         address _tokenContract,
-        address _evidenceStorage) {
+        address _evidenceStorage,
+        address _signer) {
         tokenContract = IToken(_tokenContract);
         addressEvidenceStorage = _evidenceStorage; 
+        signer = _signer;
     }
 
-    function isEvidenceValid(bytes32 evidenceHash) public view returns (bool) {
+    function isEvidenceValid(bytes32 _evidenceHash) public view returns (bool) {
         // uint256 validDuration = 7 days;
         uint256 validDuration = 10 seconds;
-        uint256 createAt = getCreateAtFromEvidenceStorage(evidenceHash);
+        uint256 createAt = getCreateAtFromEvidenceStorage(_evidenceHash);
         return (block.timestamp - createAt) >= validDuration;
     }
 
-    function getCreateAtFromEvidenceStorage(bytes32 evidenceHash) public  view  returns  (uint256) {
+    function isSignatureValid(bytes32 _evidenceHash, bytes memory _signature) internal {
+        require(signer.isValidSignatureNow(_evidenceHash, _signature), "Invalid signature.");
+        emit SignatureVerified(signer, _signature, true);
+    }
+
+    function getCreateAtFromEvidenceStorage(bytes32 _evidenceHash) public  view  returns  (uint256) {
         EvidenceStorage evidenceStorage = EvidenceStorage(addressEvidenceStorage);
-        return evidenceStorage.getCreateAtFromHash(evidenceHash);
+        return evidenceStorage.getCreateAtFromHash(_evidenceHash);
     } 
 
-    function validateEvidence(bytes32 evidenceHash) public returns (bool) {
-        require(!validatedEvidence[evidenceHash], "Evidence has already been validated");
-        bool isValid = isEvidenceValid(evidenceHash);
+    function validateEvidence(bytes32 _evidenceHash, bytes memory _signature) public returns (bool) {
+        require(!validatedEvidence[_evidenceHash], "Evidence has already been validated");
+        isSignatureValid(_evidenceHash, _signature);
+
+        bool isValid = isEvidenceValid(_evidenceHash);
 
         if (!isValid) {
-            emit EvidenceValidated(msg.sender, evidenceHash, false);
+            emit EvidenceValidated(msg.sender, _evidenceHash, false);
             return false;
         }
    
         tokenContract.rewardForValidEvidence(msg.sender);
-        validatedEvidence[evidenceHash] =true;
-        emit EvidenceValidated(msg.sender, evidenceHash, true);
+        validatedEvidence[_evidenceHash] =true;
+        emit EvidenceValidated(msg.sender, _evidenceHash, true);
         return true;
     }
 
-    modifier onlyValidEvidence(bytes32 evidenceHash) {
-        require(isEvidenceValid(evidenceHash), "Evidence is not valid");
+    modifier onlyValidEvidence(bytes32 _evidenceHash) {
+        require(isEvidenceValid(_evidenceHash), "Evidence is not valid");
         _;
     } 
 }

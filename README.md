@@ -38,7 +38,8 @@ Constructor deploy smart contract:
 
 - Owner smart conntract
 - Supply token
-- Tax point 0-10000 (1% = 100) - Addreess pool
+- Tax point 0-10000 (1% = 100)
+- Addreess pool
 
 #### 2. Smart contract Timelock
 
