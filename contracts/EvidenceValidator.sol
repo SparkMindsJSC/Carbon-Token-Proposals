@@ -15,7 +15,6 @@ contract EvidenceValidator {
 
     IToken public tokenContract;
     address public addressEvidenceStorage;
-    address public signer;
 
     event EvidenceValidated(address indexed submitter, bytes32 indexed evidenceHash, bool isValid);
     event SignatureVerified(address indexed submitter, bytes indexed signature, bool isVerified);
@@ -27,7 +26,6 @@ contract EvidenceValidator {
         address _evidenceStorage) {
         tokenContract = IToken(_tokenContract);
         addressEvidenceStorage = _evidenceStorage; 
-        signer = msg.sender;
     }
 
     function isEvidenceValid(bytes32 _evidenceHash) public view returns (bool) {
@@ -43,8 +41,10 @@ contract EvidenceValidator {
     } 
 
     function isSignatureValid(bytes32 _evidenceHash, bytes memory _signature) public {
-        require(signer.isValidSignatureNow(_evidenceHash, _signature), "Invalid signature.");
-        emit SignatureVerified(signer, _signature, true);
+        address _signer = msg.sender;
+
+        require(_signer.isValidSignatureNow(_evidenceHash, _signature), "Invalid signature.");
+        emit SignatureVerified(_signer, _signature, true);
     }
 
     function validateEvidence(bytes32 _evidenceHash, bytes memory _signature) public returns (bool) {

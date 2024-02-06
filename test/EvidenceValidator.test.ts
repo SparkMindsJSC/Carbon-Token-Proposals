@@ -3,7 +3,11 @@ import { Signer } from "ethers";
 import { beforeEach, describe } from "mocha";
 import { EvidenceStorage, EvidenceValidator, Token } from "../typechain-types";
 import { ethers } from "hardhat";
-import { hashEvidence, signEvidence } from "../utils/HashCrypto";
+import {
+  hashEvidence,
+  signEvidence,
+  verifySignature,
+} from "../utils/HashCrypto";
 
 const privateKeySubmitter = process.env.PRIVATE_KEY_SUBMITTER || "";
 
@@ -62,6 +66,9 @@ describe("Evidence validator test smart contract", function () {
     console.log("Evidence hash: ", evidenceHash);
     console.log("Submitter address: ", await submitter.getAddress());
     console.log("Private key: ", privateKeySubmitter);
+
+    const addressSigner = await verifySignature(evidenceHash, signature);
+    console.log("Address signer: ", addressSigner);
 
     //Set reward token amount
     await tokenContract.connect(owner).setRewardTokenAmount(500);
