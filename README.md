@@ -17,8 +17,9 @@ Install this project with yarn
 To run this project, you will need to add the following environment variables to your .env file
 
 `PRIVATE_KEY`
+`PRIVATE_KEY_SUBMITTER`
 
-Private key of address account owner will deploy smart contract
+Private key of address account owner will deploy smart contract and an account submitter evidence.
 
 ## Run Locally
 
@@ -59,6 +60,18 @@ Build a decentralized governance mechanism, create proposals for construction an
 ## Running Tests
 
 To run tests, run the following command
+
+#### Open terminal and run rpc hardhat node for local:
+
+```bash
+  npx hardhat node
+```
+
+👉 Copy the entire address and secret key displayed on the terminal for use.
+
+###### ❗❗ keep terminal until you don't want to use local node
+
+#### Open new terminal Start test with hardhat:
 
 ```bash
   npx hardhat test
