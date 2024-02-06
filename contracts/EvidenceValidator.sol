@@ -24,11 +24,10 @@ contract EvidenceValidator {
 
     constructor(
         address _tokenContract,
-        address _evidenceStorage,
-        address _signer) {
+        address _evidenceStorage) {
         tokenContract = IToken(_tokenContract);
         addressEvidenceStorage = _evidenceStorage; 
-        signer = _signer;
+        signer = msg.sender;
     }
 
     function isEvidenceValid(bytes32 _evidenceHash) public view returns (bool) {
@@ -38,15 +37,15 @@ contract EvidenceValidator {
         return (block.timestamp - createAt) >= validDuration;
     }
 
-    function isSignatureValid(bytes32 _evidenceHash, bytes memory _signature) internal {
-        require(signer.isValidSignatureNow(_evidenceHash, _signature), "Invalid signature.");
-        emit SignatureVerified(signer, _signature, true);
-    }
-
     function getCreateAtFromEvidenceStorage(bytes32 _evidenceHash) public  view  returns  (uint256) {
         EvidenceStorage evidenceStorage = EvidenceStorage(addressEvidenceStorage);
         return evidenceStorage.getCreateAtFromHash(_evidenceHash);
     } 
+
+    function isSignatureValid(bytes32 _evidenceHash, bytes memory _signature) public {
+        require(signer.isValidSignatureNow(_evidenceHash, _signature), "Invalid signature.");
+        emit SignatureVerified(signer, _signature, true);
+    }
 
     function validateEvidence(bytes32 _evidenceHash, bytes memory _signature) public returns (bool) {
         require(!validatedEvidence[_evidenceHash], "Evidence has already been validated");
