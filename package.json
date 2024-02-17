@@ -17,10 +17,10 @@
     "@types/node": "^20.11.6",
     "chai": "4.2.0",
     "dotenv": "^16.4.1",
-    "ethers": "6.4.0",
+    "ethers": "^6.11.0",
     "hardhat": "^2.19.4",
     "hardhat-gas-reporter": "1.0.8",
-    "solidity-coverage": "0.8.0",
+    "solidity-coverage": "^0.8.7",
     "ts-node": "^10.9.2",
     "typechain": "8.3.0",
     "typescript": "^5.3.3"

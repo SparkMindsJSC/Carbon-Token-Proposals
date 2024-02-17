@@ -44,30 +44,29 @@ describe("Evidence validator test smart contract", function () {
       [tokenContract.target, EvidenceStorageContract.target]
     );
     await EvidenceValidatorContract.waitForDeployment();
-
-    console.log("Smart contract successfully deployed");
   });
 
   it("Should signature valid", async function () {
-    const evidenceHash = hashEvidence("Cong ty sparkminds");
-    const signature = await signEvidence(evidenceHash, privateKeySubmitter);
+    const message = "Examples string for test 17/2/2024.";
+    const evidenceHash = hashEvidence(message);
+    const signature = await signEvidence(message, privateKeySubmitter);
 
-    const validSignature = await EvidenceValidatorContract.isSignatureValid(
-      evidenceHash,
-      signature
-    );
+    const addressSigner = await verifySignature(message, signature);
+
+    console.log("Address signer: ", addressSigner);
+
+    const validSignature = await EvidenceValidatorContract.connect(
+      submitter
+    ).isSignatureValid(evidenceHash, signature);
     expect(validSignature).to.be.true;
   });
 
   it("Should validate evidence and reward submitter", async function () {
-    const evidenceHash = hashEvidence("Cong ty sparkminds");
-    const signature = await signEvidence(evidenceHash, privateKeySubmitter);
-    console.log("Signature: ", signature);
-    console.log("Evidence hash: ", evidenceHash);
-    console.log("Submitter address: ", await submitter.getAddress());
-    console.log("Private key: ", privateKeySubmitter);
+    const message = "Message for test 17/2.";
+    const evidenceHash = hashEvidence(message);
+    const signature = await signEvidence(message, privateKeySubmitter);
 
-    const addressSigner = await verifySignature(evidenceHash, signature);
+    const addressSigner = await verifySignature(message, signature);
     console.log("Address signer: ", addressSigner);
 
     //Set reward token amount
@@ -78,22 +77,33 @@ describe("Evidence validator test smart contract", function () {
       signature
     );
 
+    // Get create at time
+    const createAt = await EvidenceValidatorContract.connect(
+      submitter
+    ).getCreateAtFromEvidenceStorage(evidenceHash);
+
+    console.log("Signature: ", signature);
+    console.log("Evidence hash: ", evidenceHash);
+    console.log("Create at time: ", createAt);
+
     await expect(
       EvidenceValidatorContract.connect(submitter).validateEvidence(
         evidenceHash,
         signature
       )
     )
-      .to.emit(EvidenceValidatorContract, "evidenceValidated")
+      .to.emit(EvidenceValidatorContract, "EvidenceValidated")
       .withArgs(submitter.getAddress, evidenceHash, true);
-
-    const balanceSubmitter = await tokenContract.balanceOf(
-      await submitter.getAddress()
-    );
-    expect(balanceSubmitter).to.equal(500);
 
     const isEvidenceValidated =
       await EvidenceValidatorContract.validatedEvidence(evidenceHash);
     expect(isEvidenceValidated).to.be.true;
+
+    const balanceSubmitter = await tokenContract.balanceOf(
+      await submitter.getAddress()
+    );
+    console.log("Balance received after valid evidence: " + balanceSubmitter);
+
+    expect(balanceSubmitter).to.equal(500);
   });
 });

@@ -1,7 +1,9 @@
 import { ethers } from "hardhat";
 
 export function hashEvidence(evidence: string): string {
+  // const dataHash = ethers.keccak256(ethers.toUtf8Bytes(evidence));
   const hash = ethers.hashMessage(evidence);
+
   return hash;
 }
 

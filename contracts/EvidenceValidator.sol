@@ -30,7 +30,7 @@ contract EvidenceValidator {
 
     function isEvidenceValid(bytes32 _evidenceHash) public view returns (bool) {
         // uint256 validDuration = 7 days;
-        uint256 validDuration = 10 seconds;
+        uint256 validDuration = 1 seconds;
         uint256 createAt = getCreateAtFromEvidenceStorage(_evidenceHash);
         return (block.timestamp - createAt) >= validDuration;
     }
@@ -40,16 +40,18 @@ contract EvidenceValidator {
         return evidenceStorage.getCreateAtFromHash(_evidenceHash);
     } 
 
-    function isSignatureValid(bytes32 _evidenceHash, bytes memory _signature) public {
+    function isSignatureValid(bytes32 _evidenceHash, bytes memory _signature) public view returns (bool) {
         address _signer = msg.sender;
+        _signer.isValidSignatureNow(_evidenceHash, _signature);
 
-        require(_signer.isValidSignatureNow(_evidenceHash, _signature), "Invalid signature.");
-        emit SignatureVerified(_signer, _signature, true);
+        bool resultValid = _signer.isValidSignatureNow(_evidenceHash, _signature);
+        return resultValid;
+
     }
 
     function validateEvidence(bytes32 _evidenceHash, bytes memory _signature) public returns (bool) {
         require(!validatedEvidence[_evidenceHash], "Evidence has already been validated");
-        isSignatureValid(_evidenceHash, _signature);
+        require(isSignatureValid(_evidenceHash, _signature), "Signature invalid");
 
         bool isValid = isEvidenceValid(_evidenceHash);
 
