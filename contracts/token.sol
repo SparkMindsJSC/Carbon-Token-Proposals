@@ -27,7 +27,7 @@ contract Token is ERC20, Ownable, ERC20Votes, ERC20Permit {
         ERC20Permit("GT")
         ERC20Votes()
         {
-            _mint(msg.sender, _inititalSupply);
+            _mint(_inititalOwner, _inititalSupply);
             transactionTaxRate = _transactionTax;
             receiveTax = _receiveTax;            
         }

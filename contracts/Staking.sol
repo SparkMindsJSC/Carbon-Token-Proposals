@@ -38,9 +38,9 @@ contract Staking  is IStakingRewards, RewardsDistributionRecipient, ReentrancyGu
 
     constructor(
         address _owner,
-        address _rewardsDistribution,
-        address _rewardToken,
-        address _stakingToken
+        address _rewardsDistribution,    
+        address _stakingToken,
+        address _rewardToken
     )  Owner(_owner) {
         rewardsToken = IERC20(_rewardToken);
         stakingToken = IERC20(_stakingToken);
