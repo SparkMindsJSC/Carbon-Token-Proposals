@@ -116,7 +116,6 @@ describe("Test smart contract staking", function () {
     const rewardBalanceAfter = await tokenContractReward.balanceOf(
       holder.getAddress()
     );
-
     expect(rewardBalanceAfter).to.be.gt(rewardBalanceBefore);
   });
 });

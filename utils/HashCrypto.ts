@@ -1,12 +1,12 @@
 import { ethers } from "hardhat";
 
-export function hashEvidence(evidence: string): string {
+function hashEvidence(evidence: string): string {
   const hash = ethers.hashMessage(evidence);
 
   return hash;
 }
 
-export async function signEvidence(
+async function signEvidence(
   message: string,
   privateKey: string
 ): Promise<string> {
@@ -15,7 +15,7 @@ export async function signEvidence(
   return signature;
 }
 
-export async function verifySignature(message: string, signature: string) {
+async function verifySignature(message: string, signature: string) {
   try {
     const recoveredAddress = ethers.verifyMessage(message, signature);
     return recoveredAddress;
@@ -23,3 +23,9 @@ export async function verifySignature(message: string, signature: string) {
     console.error("Failed to verify signature:", error);
   }
 }
+
+async function hashDescripton(description: string): Promise<string> {
+  return ethers.keccak256(ethers.toUtf8Bytes(description));
+}
+
+export { hashEvidence, signEvidence, verifySignature, hashDescripton };
