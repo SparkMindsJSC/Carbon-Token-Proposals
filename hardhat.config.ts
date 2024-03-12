@@ -3,10 +3,19 @@ import "@nomicfoundation/hardhat-toolbox";
 require("dotenv").config();
 
 const privateKeyOwner = process.env.PRIVATE_KEY_OWNER || "";
-const privateKeyAccount1 = process.env.PRIVATE_KEY_OWNER || "";
+const privateKeyAccount1 = process.env.PRIVATE_KEY_ACCOUNT1 || "";
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+
   defaultNetwork: "localhost",
   networks: {
     localhost: {

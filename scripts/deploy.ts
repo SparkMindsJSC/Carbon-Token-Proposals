@@ -5,10 +5,10 @@ async function main() {
 
   // Token
   const Token = await ethers.deployContract("Token", [
-    owner,
-    "10000000000000000000000",
+    owner.address,
+    "1000000000000000000000",
     "200",
-    owner,
+    account1.address,
   ]);
   await Token.waitForDeployment();
 
@@ -28,8 +28,8 @@ async function main() {
   // Timelock
   const TimeLockContract = await ethers.deployContract("Timelock", [
     120,
-    account1,
-    owner,
+    [account1.address],
+    [owner.address],
   ]);
   await TimeLockContract.waitForDeployment();
   console.log("Deployed smart contract timelock: " + TimeLockContract.target);

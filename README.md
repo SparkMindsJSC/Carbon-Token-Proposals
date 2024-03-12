@@ -57,6 +57,19 @@ Build a decentralized governance mechanism, create proposals for construction an
 - Address of token wrapped by ERC20Votes.
 - Address of smart contract Timelock execute.
 
+#### 4. Smart contract EvidenceStorage
+
+Store and retrieve evidence and evidence submission address information on the blockchain.
+
+- Address owner smart contract.
+
+#### 5. Smart contract EvidenceValidator
+
+Check the validity of evidences and distribute rewards.
+
+- Address token.
+- Address smart contract evidence storage.
+
 ## Running Tests
 
 To run tests, run the following command
@@ -87,14 +100,8 @@ Deployment smart contract in manta network testnet
   npx hardat compile
 ```
 
-#### To deploy smart contract token
+#### To deploy smart contract
 
 ```bash
-  npx hardhat run --network manta scripts/deploy-token.ts
-```
-
-#### To deploy smart contract airdrop
-
-```bash
-  npx hardhat run --network manta scripts/deploy-airdrop.ts
+  npx hardhat run --network manta scripts/deploy.ts
 ```

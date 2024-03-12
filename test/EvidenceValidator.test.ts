@@ -18,7 +18,6 @@ describe("Evidence validator test smart contract", function () {
   let tokenContract: Token;
   let EvidenceStorageContract: EvidenceStorage;
   let EvidenceValidatorContract: EvidenceValidator;
-  let testerAddress: string;
 
   beforeEach(async function () {
     [owner, submitter, attacker, pool] = await ethers.getSigners();
@@ -53,8 +52,6 @@ describe("Evidence validator test smart contract", function () {
 
     const addressSigner = await verifySignature(message, signature);
 
-    console.log("Address signer: ", addressSigner);
-
     const validSignature = await EvidenceValidatorContract.connect(
       submitter
     ).isSignatureValid(evidenceHash, signature);
@@ -67,7 +64,6 @@ describe("Evidence validator test smart contract", function () {
     const signature = await signEvidence(message, privateKeySubmitter);
 
     const addressSigner = await verifySignature(message, signature);
-    console.log("Address signer: ", addressSigner);
 
     //Set reward token amount
     await tokenContract.connect(owner).setRewardTokenAmount(500);
@@ -81,10 +77,6 @@ describe("Evidence validator test smart contract", function () {
     const createAt = await EvidenceValidatorContract.connect(
       submitter
     ).getCreateAtFromEvidenceStorage(evidenceHash);
-
-    console.log("Signature: ", signature);
-    console.log("Evidence hash: ", evidenceHash);
-    console.log("Create at time: ", createAt);
 
     await expect(
       EvidenceValidatorContract.connect(submitter).validateEvidence(
@@ -102,7 +94,6 @@ describe("Evidence validator test smart contract", function () {
     const balanceSubmitter = await tokenContract.balanceOf(
       await submitter.getAddress()
     );
-    console.log("Balance received after valid evidence: " + balanceSubmitter);
 
     expect(balanceSubmitter).to.equal(500);
   });

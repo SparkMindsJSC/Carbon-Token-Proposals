@@ -72,26 +72,26 @@ contract Token is ERC20, Ownable, ERC20Votes, ERC20Permit {
         receiveTax = _newReceiveTax;
     }
 
-        function transfer(address to, uint256 amount) public virtual  override returns (bool) {
-            uint256 taxAmount = (amount * transactionTaxRate) / 10000;
-            uint256 afterTaxAmount = amount - taxAmount;
-            require(taxAmount>= 0, "tax Amount can not less 0");
+    function transfer(address to, uint256 amount) public virtual  override returns (bool) {
+        uint256 taxAmount = (amount * transactionTaxRate) / 10000;
+        uint256 afterTaxAmount = amount - taxAmount;
+        require(taxAmount>= 0, "tax Amount can not less 0");
 
-            poolReward += taxAmount;
-            require(super.transfer( to, afterTaxAmount), "Token transfer failed.");
-            
-            require(super.transfer( receiveTax, taxAmount), "Transfer to pool failed");    
-            
-            if (holderSince[to] == 0) {
-                holderSince[to] = block.timestamp;
-            }
-
-            return true;            
-        }  
-
-        function rewardForValidEvidence(address recipient) external  {
-            require(recipient != address(0), "Address is not valid.");
-            super._mint(recipient, rewardTokenAmount);
+        poolReward += taxAmount;
+        require(super.transfer( to, afterTaxAmount), "Token transfer failed.");
+        
+        require(super.transfer( receiveTax, taxAmount), "Transfer to pool failed");    
+        
+        if (holderSince[to] == 0) {
+            holderSince[to] = block.timestamp;
         }
+
+        return true;            
+    }  
+
+    function rewardForValidEvidence(address recipient) external  {
+        require(recipient != address(0), "Address is not valid.");
+        super._mint(recipient, rewardTokenAmount);
+    }
 
 }
