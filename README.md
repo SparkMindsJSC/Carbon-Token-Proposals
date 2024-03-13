@@ -16,7 +16,7 @@ Install this project with yarn
 
 To run this project, you will need to add the following environment variables to your .env file
 
-`PRIVATE_KEY`
+`PRIVATE_KEY_OWNER`
 `PRIVATE_KEY_SUBMITTER`
 
 Private key of address account owner will deploy smart contract and an account submitter evidence.
@@ -40,7 +40,7 @@ Constructor deploy smart contract:
 - Owner smart conntract
 - Supply token
 - Tax point 0-10000 (1% = 100)
-- Addreess pool
+- Address pool
 
 #### 2. Smart contract Timelock
 
@@ -74,7 +74,7 @@ Check the validity of evidences and distribute rewards.
 
 To run tests, run the following command
 
-#### Open terminal and run rpc hardhat node for local:
+#### Open terminal and run rpc hardhat node for local
 
 ```bash
   npx hardhat node
@@ -84,7 +84,7 @@ To run tests, run the following command
 
 ###### ❗❗ keep terminal until you don't want to use local node
 
-#### Open new terminal Start test with hardhat:
+#### Open new terminal Start test with hardhat
 
 ```bash
   npx hardhat test
@@ -102,6 +102,24 @@ Deployment smart contract in manta network testnet
 
 #### To deploy smart contract
 
+##### Manta Network Testnet
+
 ```bash
   npx hardhat run --network manta scripts/deploy.ts
 ```
+
+##### Sepolia Network Testnet
+
+```bash
+  npx hardhat run --network sepolia scripts/deploy.ts
+```
+
+### This is address smart contracts deployed
+
+#### Check in Sepolia scan at here: <https://sepolia.etherscan.io/>
+
+- tokenAddress = "0x3F75E56495a31db40EaE9E29ceF3DaeC18fd7f83";
+- timeLockAddress = "0x57e95b2e4Dfa01323a1F15db48d6A90e497c895D";
+- evidenceStorageAddress = "0x57799ACbC4a1Fd531f702682ad5B0b6355d0451A";
+- governorAddress = "0x7b723e8698BE2B35001Abc7CCF3FF33A9521c908";
+- evidenceValidateAddress = "0xC0bd5B5069eF1f6Ef7093776cc8b5c071adFcC65";
